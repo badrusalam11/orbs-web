@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="icon" href="https://raw.githubusercontent.com/badrusalam11/orbs-cli/refs/heads/main/assets/orbs.ico" />
-<title>Orbs — Automation Testing, Reimagined</title>
+<title>Orbs — Automation Testing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -861,7 +861,7 @@
         <li><a href="#how">How It Works</a></li>
         <li><a href="#showcase">Studio</a></li>
         <li><a href="https://docs.orbsapp.com" target="_blank">Docs</a></li>
-        <li><a href="#" class="nav-cta btn">Download</a></li>
+        <li><a href="#" class="nav-cta btn" onclick="event.preventDefault(); document.getElementById('download').scrollIntoView({ behavior: 'smooth', block: 'start' });">Download</a></li>
       </ul>
     </div>
   </div>
@@ -876,7 +876,7 @@
   <h1>An automation framework<br /><span class="gradient-text">that grows with your team.</span></h1>
   <p>Write, run, and analyze automated tests at the speed of thought. A next-gen platform built for developers who refuse to compromise.</p>
   <div class="hero-actions">
-    <a href="#" class="btn btn-primary">⬇ Download Orbs Studio</a>
+    <a id="hero-download" href="#download" class="btn btn-primary" onclick="event.preventDefault(); document.getElementById('download').scrollIntoView({ behavior: 'smooth', block: 'start' });">⬇ Download Orbs Studio</a>
     <a href="https://docs.orbsapp.com" target="_blank" class="btn btn-secondary">View Docs →</a>
   </div>
 
