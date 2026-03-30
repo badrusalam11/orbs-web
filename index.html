@@ -7,7 +7,7 @@
 <title>Orbs — Automation Testing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -28,7 +28,7 @@
     --accent-glow-2: rgba(124,92,247,0.2);
     --green: #34d399;
     --orange: #fb923c;
-    --font-display: 'Syne', sans-serif;
+    --font-display: 'Space Grotesk', sans-serif;
     --font-body: 'Geist', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
   }
@@ -889,6 +889,9 @@
     </div>
     <div class="terminal-body">
       <div class="t-line"><span class="t-prompt">~/project $</span>&nbsp;<span class="t-cmd">pip install orbs-cli</span></div>
+      <div class="terminal" id="cli-typing">
+        <div class="line"></div>
+    </div>
       <div class="t-line"><span class="t-out">Successfully installed orbs-cli-0.6.0</span></div>
       <div class="t-line">&nbsp;</div>
       <div class="t-line"><span class="t-prompt">~/project $</span>&nbsp;<span class="t-cmd">orbs init web-project --template=web</span></div>
