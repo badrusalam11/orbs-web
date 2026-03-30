@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" href="https://raw.githubusercontent.com/badrusalam11/orbs-cli/refs/heads/main/assets/orbs.ico" />
+<title>Orbs — Automation Testing, Reimagined</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #080a0f;
+    --bg-2: #0d1117;
+    --bg-3: #111620;
+    --surface: rgba(255,255,255,0.04);
+    --surface-2: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.08);
+    --border-2: rgba(255,255,255,0.14);
+    --text: #f0f2f7;
+    --text-2: #8b92a5;
+    --text-3: #555d6e;
+    --accent: #4f8ef7;
+    --accent-2: #7c5cf7;
+    --accent-glow: rgba(79,142,247,0.25);
+    --accent-glow-2: rgba(124,92,247,0.2);
+    --green: #34d399;
+    --orange: #fb923c;
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'Geist', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Noise overlay ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.6;
+  }
+
+  /* ── Layout helpers ── */
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+  section { position: relative; z-index: 1; }
+
+  /* ── Gradient orbs in background ── */
+  .bg-orbs {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .bg-orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(120px); opacity: 0.15;
+    animation: drift 20s ease-in-out infinite alternate;
+  }
+  .bg-orb-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, #4f8ef7, transparent 70%);
+    top: -200px; left: -100px;
+    animation-duration: 25s;
+  }
+  .bg-orb-2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #7c5cf7, transparent 70%);
+    top: 20%; right: -150px;
+    animation-duration: 30s; animation-delay: -10s;
+  }
+  .bg-orb-3 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #34d399, transparent 70%);
+    bottom: 10%; left: 20%;
+    animation-duration: 22s; animation-delay: -5s;
+  }
+  @keyframes drift {
+    from { transform: translate(0,0) scale(1); }
+    to   { transform: translate(40px, 30px) scale(1.05); }
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 16px 0;
+    background: rgba(8,10,15,0.7);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-display); font-size: 22px; font-weight: 800;
+    letter-spacing: -0.5px; color: var(--text);
+    text-decoration: none;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, #4f8ef7, #7c5cf7);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; box-shadow: 0 0 20px rgba(79,142,247,0.4);
+  }
+  .nav-links {
+    display: flex; gap: 8px; align-items: center;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--text-2); text-decoration: none; font-size: 14px;
+    padding: 6px 14px; border-radius: 8px;
+    transition: all 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); background: var(--surface); }
+  .nav-cta {
+    background: linear-gradient(135deg, #4f8ef7, #7c5cf7) !important;
+    color: #fff !important;
+    font-weight: 500 !important;
+    box-shadow: 0 0 20px rgba(79,142,247,0.3);
+  }
+  .nav-cta:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 24px rgba(79,142,247,0.4) !important; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border-2);
+    border-radius: 100px;
+    font-size: 12px; font-weight: 500;
+    color: var(--text-2); letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    animation: fadeUp 0.8s ease both;
+  }
+  .hero-badge-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: pulse 2s ease infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(56px, 8vw, 96px);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -3px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+  .hero h1 .gradient-text {
+    background: linear-gradient(135deg, #4f8ef7 0%, #7c5cf7 50%, #a78bfa 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    font-size: clamp(16px, 2vw, 20px);
+    color: var(--text-2); max-width: 540px; margin: 0 auto 40px;
+    font-weight: 300; line-height: 1.7;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+  .hero-actions {
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px; border-radius: 10px;
+    font-size: 15px; font-weight: 500;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: all 0.2s; font-family: var(--font-body);
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #4f8ef7, #7c5cf7);
+    color: #fff;
+    box-shadow: 0 0 30px rgba(79,142,247,0.3), 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 40px rgba(79,142,247,0.5), 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border-2);
+  }
+  .btn-secondary:hover {
+    background: var(--surface-2);
+    border-color: rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+  }
+
+  /* ── Terminal preview ── */
+  .hero-terminal {
+    margin-top: 64px;
+    width: 100%; max-width: 760px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 0 80px rgba(79,142,247,0.1), 0 40px 80px rgba(0,0,0,0.5);
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+  .terminal-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 14px 20px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+  .terminal-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+  }
+  .terminal-dot:nth-child(1) { background: #ff5f57; }
+  .terminal-dot:nth-child(2) { background: #febc2e; }
+  .terminal-dot:nth-child(3) { background: #28c840; }
+  .terminal-title {
+    font-family: var(--font-mono); font-size: 12px;
+    color: var(--text-3); margin-left: 8px;
+  }
+  .terminal-body {
+    padding: 24px 28px;
+    font-family: var(--font-mono);
+    font-size: 13px; line-height: 2;
+    text-align: left;
+  }
+  .t-prompt { color: var(--text-3); }
+  .t-cmd    { color: var(--text); }
+  .t-kw     { color: #4f8ef7; }
+  .t-str    { color: var(--green); }
+  .t-comment { color: var(--text-3); font-style: italic; }
+  .t-out    { color: var(--text-2); }
+  .t-success { color: var(--green); }
+  .t-error  { color: #f87171; }
+  .t-line   { display: flex; gap: 4px; }
+  .cursor   {
+    display: inline-block; width: 8px; height: 14px;
+    background: var(--accent); vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ── Section commons ── */
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 16px; font-family: var(--font-mono);
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 800; line-height: 1.1;
+    letter-spacing: -2px; margin-bottom: 20px;
+  }
+  .section-desc {
+    font-size: 17px; color: var(--text-2); max-width: 520px;
+    line-height: 1.7; font-weight: 300;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 0;
+  }
+
+  /* ── FEATURES ── */
+  .features { padding: 100px 0; }
+  .features-header { text-align: center; margin-bottom: 64px; }
+  .features-header .section-desc { margin: 0 auto; }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .feature-card {
+    background: var(--bg-2);
+    padding: 36px 32px;
+    transition: background 0.3s;
+    cursor: default;
+  }
+  .feature-card:hover { background: var(--bg-3); }
+  .feature-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+  }
+  .feature-card h3 {
+    font-family: var(--font-display);
+    font-size: 18px; font-weight: 700; margin-bottom: 10px;
+  }
+  .feature-card p { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+  .feature-tag {
+    display: inline-block; margin-top: 16px;
+    padding: 3px 10px; border-radius: 100px;
+    font-family: var(--font-mono); font-size: 11px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-3);
+  }
+
+  /* ── HOW IT WORKS ── */
+  .how { padding: 100px 0; }
+  .how-header { text-align: center; margin-bottom: 72px; }
+  .how-steps {
+    display: flex; gap: 0;
+    position: relative;
+  }
+  .how-steps::before {
+    content: '';
+    position: absolute; top: 36px; left: calc(16.67% + 18px); right: calc(16.67% + 18px);
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    z-index: 0;
+  }
+  .how-step {
+    flex: 1; text-align: center; padding: 0 24px;
+    position: relative; z-index: 1;
+  }
+  .how-step-num {
+    width: 72px; height: 72px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 28px;
+    font-family: var(--font-display); font-size: 24px; font-weight: 800;
+    border: 1px solid var(--border-2);
+    background: var(--bg-2);
+    position: relative;
+  }
+  .how-step:nth-child(1) .how-step-num { color: var(--accent); box-shadow: 0 0 30px rgba(79,142,247,0.2); }
+  .how-step:nth-child(2) .how-step-num { color: var(--accent-2); box-shadow: 0 0 30px rgba(124,92,247,0.2); }
+  .how-step:nth-child(3) .how-step-num { color: var(--green); box-shadow: 0 0 30px rgba(52,211,153,0.2); }
+  .how-step h3 {
+    font-family: var(--font-display);
+    font-size: 20px; font-weight: 700; margin-bottom: 12px;
+  }
+  .how-step p { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+  .how-step-icon { font-size: 28px; }
+
+  /* ── SHOWCASE ── */
+  .showcase { padding: 100px 0; }
+  .showcase-inner {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden;
+  }
+  .showcase-ui {
+    background: var(--bg-2); padding: 0;
+    display: flex; flex-direction: column;
+  }
+  .showcase-ui-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+  }
+  .sui-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .sui-dot:nth-child(1) { background: #ff5f57; }
+  .sui-dot:nth-child(2) { background: #febc2e; }
+  .sui-dot:nth-child(3) { background: #28c840; }
+  .sui-title {
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-3);
+    margin-left: 8px;
+  }
+  .studio-mock {
+    display: flex; height: 340px;
+  }
+  .studio-sidebar {
+    width: 180px; border-right: 1px solid var(--border);
+    padding: 16px 12px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .sidebar-label {
+    font-family: var(--font-mono); font-size: 9px;
+    text-transform: uppercase; letter-spacing: 1px;
+    color: var(--text-3); padding: 8px 8px 4px;
+  }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px; border-radius: 7px;
+    font-size: 12px; color: var(--text-2);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .sidebar-item:hover, .sidebar-item.active {
+    background: var(--surface-2); color: var(--text);
+  }
+  .sidebar-item.active { color: var(--accent); }
+  .sidebar-icon { font-size: 13px; opacity: 0.7; }
+  .studio-main {
+    flex: 1; padding: 16px;
+    display: flex; flex-direction: column; gap: 10px;
+    overflow: hidden;
+  }
+  .studio-toolbar {
+    display: flex; gap: 6px; align-items: center;
+  }
+  .tb-btn {
+    padding: 5px 12px; border-radius: 6px;
+    font-size: 11px; font-family: var(--font-mono);
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-2); cursor: pointer;
+  }
+  .tb-btn.run {
+    background: linear-gradient(135deg,#4f8ef7,#7c5cf7);
+    color: #fff; border-color: transparent;
+    box-shadow: 0 0 12px rgba(79,142,247,0.3);
+  }
+  .test-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .test-table th {
+    text-align: left; padding: 6px 10px;
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--text-3); border-bottom: 1px solid var(--border);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .test-table td { padding: 8px 10px; color: var(--text-2); }
+  .test-table tr:hover td { background: var(--surface); color: var(--text); }
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 2px 8px; border-radius: 100px; font-size: 10px;
+    font-family: var(--font-mono);
+  }
+  .status-pass { background: rgba(52,211,153,0.1); color: var(--green); }
+  .status-fail { background: rgba(248,113,113,0.1); color: #f87171; }
+  .status-run  { background: rgba(79,142,247,0.1); color: var(--accent); }
+
+  /* code panel */
+  .showcase-code {
+    background: var(--bg-2); overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 20px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono); font-size: 12px; color: var(--text-3);
+  }
+  .code-lang {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .code-lang-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2); }
+  .code-body {
+    padding: 24px; font-family: var(--font-mono);
+    font-size: 12px; line-height: 1.9;
+    flex: 1; overflow: auto;
+  }
+  .code-body::-webkit-scrollbar { width: 4px; }
+  .code-body::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
+  .c-kw  { color: #c792ea; }
+  .c-fn  { color: #82aaff; }
+  .c-str { color: #c3e88d; }
+  .c-num { color: #f78c6c; }
+  .c-dec { color: #ffcb6b; }
+  .c-cmt { color: #546e7a; font-style: italic; }
+  .c-cls { color: #ffcb6b; }
+  .c-self { color: #f07178; }
+
+  /* ── STATS BAR ── */
+  .stats { padding: 60px 0; }
+  .stats-inner {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden;
+  }
+  .stat-item {
+    background: var(--bg-2); padding: 36px 28px; text-align: center;
+    transition: background 0.2s;
+  }
+  .stat-item:hover { background: var(--bg-3); }
+  .stat-num {
+    font-family: var(--font-display); font-size: 44px; font-weight: 800;
+    letter-spacing: -2px; line-height: 1;
+    background: linear-gradient(135deg, #4f8ef7, #7c5cf7);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: 8px;
+  }
+  .stat-label { font-size: 13px; color: var(--text-2); font-weight: 300; }
+
+  /* ── CTA ── */
+  .cta-section { padding: 100px 0 120px; text-align: center; }
+  .cta-card {
+    background: linear-gradient(135deg, rgba(79,142,247,0.08), rgba(124,92,247,0.08));
+    border: 1px solid rgba(79,142,247,0.2);
+    border-radius: 24px; padding: 80px 40px;
+    position: relative; overflow: hidden;
+  }
+  .cta-card::before {
+    content: '';
+    position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+    width: 400px; height: 300px;
+    background: radial-gradient(ellipse, rgba(79,142,247,0.15), transparent 70%);
+    pointer-events: none;
+  }
+  .cta-card h2 {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5vw, 60px);
+    font-weight: 800; letter-spacing: -2px;
+    line-height: 1.1; margin-bottom: 20px;
+  }
+  .cta-card p { font-size: 18px; color: var(--text-2); margin-bottom: 40px; font-weight: 300; }
+  .cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .cta-note {
+    margin-top: 20px; font-size: 13px; color: var(--text-3);
+    font-family: var(--font-mono);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 48px 0; color: var(--text-3); font-size: 14px;
+  }
+  .footer-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 24px;
+  }
+  .footer-logo { display: flex; align-items: center; gap: 8px; }
+  .footer-logo span {
+    font-family: var(--font-display); font-size: 18px; font-weight: 800;
+    color: var(--text-2);
+  }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a {
+    color: var(--text-3); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--text-2); }
+  .footer-copy { color: var(--text-3); font-size: 13px; }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .features-grid { grid-template-columns: 1fr 1fr; }
+    .how-steps { flex-direction: column; gap: 40px; }
+    .how-steps::before { display: none; }
+    .showcase-inner { grid-template-columns: 1fr; }
+    .stats-inner { grid-template-columns: 1fr 1fr; }
+    nav .nav-links { display: none; }
+  }
+  @media (max-width: 600px) {
+    .features-grid { grid-template-columns: 1fr; }
+    .stats-inner { grid-template-columns: 1fr 1fr; }
+    .footer-inner { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* ── Studio Tab Nav (above window) ── */
+  .studio-tabs-nav {
+    display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .stab {
+    padding: 8px 18px; border-radius: 8px;
+    font-size: 13px; font-weight: 500; font-family: var(--font-body);
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-2); cursor: pointer; transition: all 0.2s;
+  }
+  .stab:hover { background: var(--surface-2); color: var(--text); }
+  .stab.active {
+    background: linear-gradient(135deg,rgba(79,142,247,0.15),rgba(124,92,247,0.15));
+    border-color: rgba(79,142,247,0.4); color: var(--text);
+  }
+
+  /* ── Studio Window Shell ── */
+  .studio-window {
+    border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+    box-shadow: 0 0 80px rgba(79,142,247,0.08), 0 32px 80px rgba(0,0,0,0.5);
+  }
+  .studio-titlebar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: #0e1117;
+    border-bottom: 1px solid var(--border);
+  }
+  .title-traffic { display: flex; gap: 6px; }
+  .tc { width: 12px; height: 12px; border-radius: 50%; }
+  .tc.red { background: #ff5f57; }
+  .tc.yellow { background: #febc2e; }
+  .tc.green { background: #28c840; }
+  .title-center-bar {
+    display: flex; align-items: center; gap: 6px;
+    flex: 1; justify-content: center; flex-wrap: wrap;
+  }
+  .title-logo {
+    font-family: var(--font-display); font-size: 14px; font-weight: 800;
+    color: var(--text); margin-right: 6px;
+  }
+  .env-pill {
+    padding: 3px 10px; border-radius: 100px;
+    background: rgba(40,200,64,0.15); border: 1px solid rgba(40,200,64,0.3);
+    font-size: 11px; color: #28c840; font-family: var(--font-mono);
+  }
+  .title-sep { width: 1px; height: 16px; background: var(--border); margin: 0 4px; }
+  .tbarbtn {
+    padding: 4px 12px; border-radius: 6px;
+    font-size: 11px; font-family: var(--font-mono);
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-2); cursor: pointer;
+  }
+  .tbarbtn-run { background: rgba(40,200,64,0.15); border-color: rgba(40,200,64,0.3); color: #28c840; }
+  .tbarbtn-rec { background: rgba(255,95,87,0.15); border-color: rgba(255,95,87,0.3); color: #ff5f57; }
+  .tbarbtn-spy { background: rgba(79,142,247,0.15); border-color: rgba(79,142,247,0.3); color: var(--accent); }
+  .tbarbtn-dbg { background: rgba(124,92,247,0.15); border-color: rgba(124,92,247,0.3); color: var(--accent-2); }
+
+  /* ── Studio Body Layout ── */
+  .studio-body { display: flex; height: 520px; }
+
+  /* Explorer */
+  .studio-explorer {
+    width: 200px; border-right: 1px solid var(--border);
+    background: #0c1016;
+    font-size: 11px; overflow-y: auto; flex-shrink: 0;
+    display: flex; flex-direction: column;
+  }
+  .studio-explorer::-webkit-scrollbar { width: 3px; }
+  .studio-explorer::-webkit-scrollbar-thumb { background: var(--border); }
+  .exp-head {
+    font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-3); padding: 10px 12px 6px; font-weight: 600;
+  }
+  .exp-item {
+    display: flex; align-items: center; gap: 5px;
+    padding: 4px 12px; color: var(--text-2); cursor: pointer;
+    transition: background 0.1s; font-family: var(--font-mono);
+    white-space: nowrap; overflow: hidden;
+  }
+  .exp-item:hover { background: var(--surface); color: var(--text); }
+  .exp-arr { width: 10px; color: var(--text-3); flex-shrink: 0; }
+  .exp-ic { font-size: 12px; flex-shrink: 0; }
+  .exp-sub { padding-left: 28px; }
+  .exp-open > .exp-ic { color: var(--accent); }
+  .exp-active { background: rgba(79,142,247,0.15) !important; color: var(--accent) !important; }
+  .exp-suite { color: var(--accent-2) !important; }
+  .exp-bottom {
+    margin-top: auto; padding: 8px 12px;
+    font-size: 10px; color: var(--text-3); border-top: 1px solid var(--border);
+  }
+
+  /* Main area */
+  .studio-main-area {
+    flex: 1; display: flex; flex-direction: column;
+    background: var(--bg-2); overflow: hidden;
+  }
+  .ftabs-bar {
+    display: flex; background: #0c1016;
+    border-bottom: 1px solid var(--border);
+  }
+  .ftab {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 16px; font-size: 12px; font-family: var(--font-mono);
+    color: var(--text-3); cursor: pointer; border-right: 1px solid var(--border);
+    transition: all 0.15s;
+  }
+  .ftab:hover { color: var(--text-2); background: var(--surface); }
+  .ftab-active { background: var(--bg-2) !important; color: var(--text) !important; border-bottom: 1px solid var(--bg-2); margin-bottom: -1px; }
+  .ftab-hidden { display: none; }
+  .ftab-x { color: var(--text-3); font-size: 11px; }
+
+  /* Panels */
+  .spanel { display: flex; flex-direction: column; height: 100%; }
+  .spanel-hidden { display: none !important; }
+
+  /* Inner tabs (Table / Script / Data Binding) */
+  .inner-tabs {
+    display: flex; border-bottom: 1px solid var(--border);
+    padding: 0 16px; gap: 0; background: var(--bg-2);
+  }
+  .itab {
+    padding: 8px 16px; font-size: 12px; color: var(--text-3);
+    cursor: pointer; border-bottom: 2px solid transparent;
+    margin-bottom: -1px; transition: all 0.15s;
+  }
+  .itab:hover { color: var(--text-2); }
+  .itab-active { color: var(--text); border-bottom-color: var(--accent); }
+
+  /* Panel actions toolbar */
+  .panel-actions {
+    display: flex; gap: 8px; align-items: center;
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+    background: var(--bg-2); flex-wrap: wrap;
+  }
+  .suite-hint { margin-left: auto; font-size: 11px; color: var(--text-3); font-family: var(--font-mono); }
+  .pabtn {
+    padding: 5px 12px; border-radius: 6px;
+    font-size: 11px; font-family: var(--font-mono);
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-2); cursor: pointer; transition: all 0.15s;
+  }
+  .pabtn:hover { background: var(--surface-2); color: var(--text); }
+  .pabtn.green { background: rgba(40,200,64,0.15); border-color: rgba(40,200,64,0.4); color: #28c840; }
+  .pabtn.blue  { background: rgba(79,142,247,0.15); border-color: rgba(79,142,247,0.4); color: var(--accent); }
+  .pabtn.red-btn { background: rgba(255,95,87,0.12); border-color: rgba(255,95,87,0.3); color: #ff5f57; }
+
+  /* Step table */
+  .step-scroll { flex: 1; overflow: auto; }
+  .step-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+  .step-scroll::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
+  .steptable { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .steptable th {
+    padding: 7px 10px; text-align: left;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    color: var(--text-3); border-bottom: 1px solid var(--border);
+    background: #0c1016; text-transform: uppercase; letter-spacing: 0.5px;
+    white-space: nowrap; position: sticky; top: 0; z-index: 2;
+  }
+  .steptable td { padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+  .steptable tr:hover td { background: rgba(255,255,255,0.02); }
+  .col-num { width: 30px; }
+  .col-plat { width: 90px; }
+  .col-kw { width: 200px; }
+  .col-cmt { width: 150px; }
+  .col-act { width: 70px; }
+  .sn { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
+  .pbadge {
+    display: inline-block; padding: 2px 8px; border-radius: 5px;
+    font-size: 11px; font-family: var(--font-mono); font-weight: 500;
+  }
+  .pb-web { background: rgba(79,142,247,0.15); color: var(--accent); border: 1px solid rgba(79,142,247,0.3); }
+  .pb-script { background: rgba(251,146,60,0.12); color: var(--orange); border: 1px solid rgba(251,146,60,0.3); }
+  .kwname { font-family: var(--font-mono); font-size: 12px; color: var(--text); }
+  .kwdesc { font-size: 10px; color: var(--text-3); margin-top: 3px; }
+  .pgrid {
+    display: grid; grid-template-columns: auto 1fr auto;
+    gap: 2px 8px; align-items: start;
+  }
+  .plabel { font-family: var(--font-mono); font-size: 10px; color: var(--text-3); white-space: nowrap; padding-top: 2px; }
+  .pval { font-family: var(--font-mono); font-size: 11px; color: var(--text-2); }
+  .ptype { font-family: var(--font-mono); font-size: 10px; color: var(--text-3); white-space: nowrap; }
+  .pstop { color: #fb923c; }
+  .pmuted { color: var(--text-3); }
+  .praw { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); font-style: italic; }
+  .cmt-ph { font-size: 11px; color: var(--text-3); font-style: italic; }
+  .check-tick { color: var(--accent); font-size: 14px; }
+
+  /* Status bar */
+  .status-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 5px 14px; background: #090d12;
+    border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--text-3); font-family: var(--font-mono);
+    flex-shrink: 0;
+  }
+  .sb-right { display: flex; align-items: center; gap: 8px; }
+  .conn-dot { color: #28c840; }
+
+  /* Script view */
+  .code-editor-view {
+    flex: 1; display: flex; overflow: auto;
+    background: var(--bg-2); font-family: var(--font-mono); font-size: 12px;
+  }
+  .code-editor-view::-webkit-scrollbar { width: 4px; }
+  .code-editor-view::-webkit-scrollbar-thumb { background: var(--border); }
+  .line-gutter {
+    padding: 16px 12px; text-align: right;
+    color: var(--text-3); background: #0c1016;
+    border-right: 1px solid var(--border); line-height: 1.9;
+    user-select: none; min-width: 40px; flex-shrink: 0;
+  }
+  .code-view-body { padding: 16px 20px; line-height: 1.9; flex: 1; }
+
+  /* Data binding */
+  .db-toolbar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .db-lbl { font-size: 12px; color: var(--text-2); white-space: nowrap; }
+  .db-inp {
+    flex: 1; min-width: 180px; padding: 5px 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; font-size: 12px; color: var(--text-3);
+    font-family: var(--font-mono);
+  }
+  .db-sel {
+    padding: 5px 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; font-size: 12px; color: var(--text-2);
+    font-family: var(--font-mono); min-width: 100px;
+  }
+  .db-body { padding: 20px; flex: 1; overflow: auto; }
+  .db-title { font-size: 13px; color: var(--text-2); margin-bottom: 6px; }
+  .db-empty { font-size: 12px; color: var(--text-3); font-style: italic; }
+  .db-preview-row { display: flex; gap: 16px; margin-top: 12px; align-items: flex-start; }
+  .db-where { min-width: 120px; }
+  .db-csv {
+    flex: 1; padding: 14px;
+    background: #0c1016; border: 1px solid var(--border);
+    border-radius: 8px; min-height: 100px;
+  }
+  .db-csv-hint { font-size: 11px; color: var(--text-3); }
+  .db-nopreview {
+    flex: 1; padding: 14px;
+    background: #0c1016; border: 1px solid var(--border);
+    border-radius: 8px; min-height: 100px;
+    font-size: 12px; color: var(--text-3); font-style: italic;
+  }
+
+  /* Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- Background orbs -->
+<div class="bg-orbs">
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#" class="logo">
+        <div class="logo-icon">⬡</div>
+        Orbs
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how">How It Works</a></li>
+        <li><a href="#showcase">Studio</a></li>
+        <li><a href="https://docs.orbsapp.com" target="_blank">Docs</a></li>
+        <li><a href="#" class="nav-cta btn">Download</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="hero-badge-dot"></span>
+    Now in Public Beta &mdash; v0.15.0
+  </div>
+  <h1>An automation framework<br /><span class="gradient-text">that grows with your team.</span></h1>
+  <p>Write, run, and analyze automated tests at the speed of thought. A next-gen platform built for developers who refuse to compromise.</p>
+  <div class="hero-actions">
+    <a href="#" class="btn btn-primary">⬇ Download Orbs Studio</a>
+    <a href="https://docs.orbsapp.com" target="_blank" class="btn btn-secondary">View Docs →</a>
+  </div>
+
+  <div class="hero-terminal">
+    <div class="terminal-header">
+      <div class="terminal-dot"></div>
+      <div class="terminal-dot"></div>
+      <div class="terminal-dot"></div>
+      <span class="terminal-title">orbs-cli — zsh</span>
+    </div>
+    <div class="terminal-body">
+      <div class="t-line"><span class="t-prompt">~/project $</span>&nbsp;<span class="t-cmd">pip install orbs-cli</span></div>
+      <div class="t-line"><span class="t-out">Successfully installed orbs-cli-0.6.0</span></div>
+      <div class="t-line">&nbsp;</div>
+      <div class="t-line"><span class="t-prompt">~/project $</span>&nbsp;<span class="t-cmd">orbs init web-project --template=web</span></div>
+      <div class="t-line"><span class="t-success">✓</span>&nbsp;<span class="t-out">✅ Project initialized at /path/to/web-project (template: web)</span></div>
+      <div class="t-line">&nbsp;</div>
+      <div class="t-line"><span class="t-prompt">~/project $</span>&nbsp;<span class="t-cmd">orbs run testsuites/login.yml <span class="t-kw">--env</span>=dev</span></div>
+      <!-- <div class="t-line"><span class="t-out">Running 12 tests across 4 workers...</span></div>
+      <div class="t-line"><span class="t-success">✓</span>&nbsp;<span class="t-out">login_flow.orb &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(342ms)</span></div>
+      <div class="t-line"><span class="t-success">✓</span>&nbsp;<span class="t-out">checkout_happy.orb &nbsp;&nbsp;(891ms)</span></div>
+      <div class="t-line"><span class="t-error">✗</span>&nbsp;<span class="t-out">api_auth_token.orb &nbsp;&nbsp;AssertionError: expected 200, got 401</span></div> -->
+  <div class="t-line"><span class="t-out">Python version: 3.9.5</span></div>
+  <div class="t-line"><span class="t-out">Python executable: /usr/local/bin/python3</span></div>
+  <div class="t-line"><span class="t-out">Orbs CLI version: 0.6.0</span></div>
+  <div class="t-line"><span class="t-success">🌍 Selected environment: dev</span></div>
+  <div class="t-line">============================================================</div>
+  <div class="t-line">              ORBS TEST EXECUTION SUMMARY                 </div>
+  <div class="t-line">============================================================</div>
+  <div class="t-line"><span class="t-out">Total Tests     : 1</span></div>
+  <div class="t-line"><span class="t-success">Passed          : 1</span></div>
+  <div class="t-line"><span class="t-error">Failed          : 0</span></div>
+  <div class="t-line"><span class="t-out">Skipped         : 0</span></div>
+  <div class="t-line"><span class="t-out">Retries         : 0</span></div>
+  <div class="t-line"><span class="t-out">Duration        : 11s</span></div>
+  <div class="t-line"><span class="t-out">Environment     : dev</span></div>
+  <div class="t-line"><span class="t-out">Browser         : Chrome (headed)</span></div>
+  <div class="t-line"><span class="t-out">Self-Healing    : Enabled</span></div>
+  <div class="t-line"><span class="t-out">Retry           : Disabled</span></div>
+  <div class="t-line">============================================================</div>
+  <div class="t-line"><span class="t-success">STATUS: PASSED</span></div>
+  <div class="t-line">============================================================</div>
+  <div class="t-line"><span class="t-success">✅ ORBS TEST EXECUTION COMPLETED (suite/collection finished)</span></div>
+
+      <div class="t-line">&nbsp;</div>
+      <div class="t-line"><span class="t-out">Tests: <span class="t-success">1 passed</span>, <span class="t-error">0 failed</span> &nbsp;|&nbsp; Duration: 11s</span></div>
+      <div class="t-line"><span class="t-prompt">~/project $</span>&nbsp;<span class="cursor"></span></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="container">
+    <div class="stats-inner">
+      <div class="stat-item reveal">
+        <div class="stat-num">10×</div>
+        <div class="stat-label">faster execution in optimized scenarios</div>
+      </div>
+      <div class="stat-item reveal" style="transition-delay:0.1s">
+        <div class="stat-num">&lt;50ms</div>
+        <div class="stat-label">CLI startup time (typical)</div>
+      </div>
+      <div class="stat-item reveal" style="transition-delay:0.2s">
+        <div class="stat-num">CI/CD</div>
+        <div class="stat-label">ready out of the box</div>
+      </div>
+      <div class="stat-item reveal" style="transition-delay:0.3s">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">custom keyword plugins</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="features-header reveal">
+      <div class="section-label">// Features</div>
+      <h2 class="section-title">Everything you need.<br />Nothing you don't.</h2>
+      <p class="section-desc">Orbs strips away the bloat of legacy test platforms and gives developers a toolset that actually matches how they work.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">⚡</div>
+        <h3>Fast &amp; Lightweight</h3>
+        <p>Built on a pure Python engine with zero JVM overhead. Run thousands of tests in seconds, not minutes. Local or distributed.</p>
+        <span class="feature-tag">python-native</span>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.08s">
+        <div class="feature-icon">🖥</div>
+        <h3>Orbs Studio</h3>
+        <p>A beautiful Electron + React desktop app for test authoring, live execution, and visual debugging. Dark mode by default. Always.</p>
+        <span class="feature-tag">electron + react</span>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.16s">
+        <div class="feature-icon">⌨</div>
+        <h3>CLI-First Workflow</h3>
+        <p>Every feature reachable via <code style="font-family:var(--font-mono);color:var(--accent);font-size:12px">orbs run</code>. Script it, alias it, schedule it. Your terminal is your home.</p>
+        <span class="feature-tag">orbs-cli</span>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.08s">
+        <div class="feature-icon">🧩</div>
+        <h3>Extensible Plugins</h3>
+        <p>Write custom keywords in plain Python. Share them via PyPI. The entire ecosystem, in your hands, with zero proprietary lock-in.</p>
+        <span class="feature-tag">open plugin API</span>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.16s">
+        <div class="feature-icon">⚙</div>
+        <h3>Parallel Orchestration</h3>
+        <p>Run multiple test suites concurrently with full control over concurrency and timing.</p>
+        <span class="feature-tag">test suite collection</span>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.24s">
+        <div class="feature-icon">🔁</div>
+        <h3>CI/CD Friendly</h3>
+        <p>GitHub Actions, GitLab CI, Jenkins, Bitbucket Pipelines. One YAML snippet and you're fully automated. No agents required.</p>
+        <span class="feature-tag">any CI pipeline</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="container">
+    <div class="how-header reveal">
+      <div class="section-label">// Workflow</div>
+      <h2 class="section-title">Simple by design.</h2>
+      <p class="section-desc" style="margin:0 auto">Three steps from zero to automated. No PhD required.</p>
+    </div>
+    <div class="how-steps">
+      <div class="how-step reveal">
+        <div class="how-step-num">
+          <span class="how-step-icon">✍</span>
+        </div>
+        <h3>Create Tests</h3>
+        <p>Write test cases in Orbs' clean YAML syntax or use Studio's visual editor. Organize by suite, tag, and environment. Reuse keywords across your entire project.</p>
+      </div>
+      <div class="how-step reveal" style="transition-delay:0.15s">
+        <div class="how-step-num">
+          <span class="how-step-icon">▶</span>
+        </div>
+        <h3>Run via CLI or Studio</h3>
+        <p>Fire off tests from the terminal with <code style="font-family:var(--font-mono);color:var(--accent-2);font-size:12px">orbs run</code> or hit the run button in Studio. Watch live output stream in as results roll in, test by test.</p>
+      </div>
+      <div class="how-step reveal" style="transition-delay:0.3s">
+        <div class="how-step-num">
+          <span class="how-step-icon">📊</span>
+        </div>
+        <h3>Analyze Results</h3>
+        <p>Get structured JSON reports, HTML dashboards, and JUnit XML — ready for any CI artifact collector. See exactly what failed, why, and on which line.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SHOWCASE -->
+<section class="showcase" id="showcase">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:40px;" class="reveal">
+      <div class="section-label">// Product</div>
+      <h2 class="section-title">Meet Orbs Studio.</h2>
+      <p class="section-desc" style="margin:0 auto">A full desktop IDE for test authoring. Switch between visual Table view, raw Script mode, Data Binding, and Event Hooks — all in one app.</p>
+    </div>
+
+    <!-- View switcher tabs -->
+    <div class="studio-tabs-nav reveal">
+      <button class="stab active" onclick="switchTab('table',this)">📋 Table View</button>
+      <button class="stab" onclick="switchTab('script',this)">📝 Script View</button>
+      <button class="stab" onclick="switchTab('suite',this)">⚡ Test Suite</button>
+      <button class="stab" onclick="switchTab('databind',this)">🔗 Data Binding</button>
+    </div>
+
+    <!-- Studio window shell -->
+    <div class="studio-window reveal">
+
+      <!-- macOS-style titlebar -->
+      <div class="studio-titlebar">
+        <div class="title-traffic"><span class="tc red"></span><span class="tc yellow"></span><span class="tc green"></span></div>
+        <div class="title-center-bar">
+          <div class="title-logo">⬡ Orbs Studio</div>
+          <div class="env-pill">● Dev ▾</div>
+          <div class="title-sep"></div>
+          <div class="tbarbtn">Platform ▾</div>
+          <div class="tbarbtn tbarbtn-run">▶ Run</div>
+          <div class="tbarbtn tbarbtn-rec">● Record</div>
+          <div class="tbarbtn tbarbtn-spy">👁 Spy</div>
+          <div class="tbarbtn tbarbtn-dbg">⬡ Debug</div>
+        </div>
+        <div style="width:80px"></div>
+      </div>
+
+      <!-- Body: sidebar + content -->
+      <div class="studio-body">
+
+        <!-- File explorer sidebar -->
+        <div class="studio-explorer">
+          <div class="exp-head">EXPLORER</div>
+          <div class="exp-item"><span class="exp-arr">▶</span><span class="exp-ic">📁</span>__pycache__</div>
+          <div class="exp-item"><span class="exp-arr">▶</span><span class="exp-ic">📁</span>.vscode</div>
+          <div class="exp-item"><span class="exp-arr">▶</span><span class="exp-ic">📁</span>data</div>
+          <div class="exp-item"><span class="exp-arr">▶</span><span class="exp-ic">📁</span>environments</div>
+          <div class="exp-item"><span class="exp-arr">▶</span><span class="exp-ic">📁</span>include</div>
+          <div class="exp-item"><span class="exp-arr">▶</span><span class="exp-ic">📁</span>listeners</div>
+          <div class="exp-item"><span class="exp-arr">▶</span><span class="exp-ic">📊</span>reports</div>
+          <div class="exp-item"><span class="exp-arr">▶</span><span class="exp-ic">⚙</span>settings</div>
+          <div class="exp-item exp-open"><span class="exp-arr">▼</span><span class="exp-ic">📁</span>testcases</div>
+          <div class="exp-item exp-sub"><span class="exp-ic">📄</span>.gitkeep</div>
+          <div class="exp-item exp-sub exp-active" id="exp-login-py">🐍 login.py</div>
+          <div class="exp-item"><span class="exp-arr">▶</span><span class="exp-ic">📁</span>testsuite_collections</div>
+          <div class="exp-item exp-open"><span class="exp-arr">▼</span><span class="exp-ic">📁</span>testsuites</div>
+          <div class="exp-item exp-sub exp-suite" id="exp-login-yml">✏ login</div>
+          <div class="exp-item"><span class="exp-ic">📄</span>__init__.py</div>
+          <div class="exp-item"><span class="exp-ic">🐳</span>Dockerfile</div>
+          <div class="exp-item"><span class="exp-ic">🐍</span>main.py</div>
+          <div class="exp-item"><span class="exp-ic">📄</span>requirements.txt</div>
+          <div class="exp-bottom">web-project</div>
+        </div>
+
+        <!-- Main content area -->
+        <div class="studio-main-area">
+
+          <!-- File tabs bar -->
+          <div class="ftabs-bar">
+            <div class="ftab ftab-active" id="ftab-py">🐍 login.py <span class="ftab-x">×</span></div>
+            <div class="ftab ftab-hidden" id="ftab-yml">⚡ login.yml <span class="ftab-x">×</span></div>
+          </div>
+
+          <!-- ── PANEL: TABLE VIEW ── -->
+          <div class="spanel" id="panel-table">
+            <div class="inner-tabs">
+              <div class="itab itab-active">Table</div>
+              <div class="itab">Script</div>
+              <div class="itab">Data Binding</div>
+            </div>
+            <div class="panel-actions">
+              <button class="pabtn green">+ Add Step</button>
+              <button class="pabtn">Apply</button>
+            </div>
+            <div class="step-scroll">
+              <table class="steptable">
+                <thead><tr>
+                  <th class="col-num">#</th><th class="col-plat">PLATFORM</th><th class="col-kw">KEYWORD</th>
+                  <th class="col-params">PARAMETERS</th><th class="col-cmt">COMMENT</th><th class="col-act">ACTIONS</th>
+                </tr></thead>
+                <tbody>
+                  <tr>
+                    <td class="sn">1</td>
+                    <td><span class="pbadge pb-script">Script</span></td>
+                    <td><div class="kwname">url = config.target("url", "htt…</div></td>
+                    <td><span class="praw">— raw script —</span></td>
+                    <td><span class="cmt-ph">optional comment…</span></td><td></td>
+                  </tr>
+                  <tr>
+                    <td class="sn">2</td><td><span class="pbadge pb-web">Web</span></td>
+                    <td><div class="kwname">open</div><div class="kwdesc">Open a URL in the browser</div></td>
+                    <td>
+                      <div class="pgrid">
+                        <span class="plabel">url*:</span><span class="pval">url</span><span class="ptype">(raw)</span>
+                        <span class="plabel">failure_handling:</span><span class="pval pstop">STOP_ON_FAILURE</span><span></span>
+                      </div>
+                    </td>
+                    <td><span class="cmt-ph">optional comment…</span></td><td></td>
+                  </tr>
+                  <tr>
+                    <td class="sn">3</td><td><span class="pbadge pb-web">Web</span></td>
+                    <td><div class="kwname">set_text</div><div class="kwdesc">Set text into an element with retry logic</div></td>
+                    <td>
+                      <div class="pgrid">
+                        <span class="plabel">locator*:</span><span class="pval">selector · xpath · //input[@id='user-name']</span><span></span>
+                        <span class="plabel">text*:</span><span class="pval">config.target("username", "standard_user")</span><span class="ptype">(raw)</span>
+                        <span class="plabel">timeout:</span><span class="pval pmuted">None</span><span></span>
+                        <span class="plabel">clear_first:</span><span class="pval">True</span><span></span>
+                        <span class="plabel">retry_count:</span><span class="pval">3</span><span></span>
+                        <span class="plabel">failure_handling:</span><span class="pval pstop">STOP_ON_FAILURE</span><span></span>
+                      </div>
+                    </td>
+                    <td><span class="cmt-ph">optional comment…</span></td><td></td>
+                  </tr>
+                  <tr>
+                    <td class="sn">4</td><td><span class="pbadge pb-web">Web</span></td>
+                    <td><div class="kwname">set_text</div><div class="kwdesc">Set text into an element with retry logic</div></td>
+                    <td>
+                      <div class="pgrid">
+                        <span class="plabel">locator*:</span><span class="pval">selector · xpath · //input[@id='password']</span><span></span>
+                        <span class="plabel">text*:</span><span class="pval">config.target("password", "secret_sauce")</span><span class="ptype">(raw)</span>
+                        <span class="plabel">clear_first:</span><span class="pval">True</span><span></span>
+                        <span class="plabel">retry_count:</span><span class="pval">3</span><span></span>
+                        <span class="plabel">failure_handling:</span><span class="pval pstop">STOP_ON_FAILURE</span><span></span>
+                      </div>
+                    </td>
+                    <td><span class="cmt-ph">optional comment…</span></td><td></td>
+                  </tr>
+                  <tr>
+                    <td class="sn">5</td><td><span class="pbadge pb-web">Web</span></td>
+                    <td><div class="kwname">click</div><div class="kwdesc">Click on an element with retry logic for stale elements</div></td>
+                    <td>
+                      <div class="pgrid">
+                        <span class="plabel">locator*:</span><span class="pval">selector · xpath · //input[@id='login-button']</span><span></span>
+                        <span class="plabel">timeout:</span><span class="pval pmuted">None</span><span></span>
+                        <span class="plabel">retry_count:</span><span class="pval">3</span><span></span>
+                        <span class="plabel">failure_handling:</span><span class="pval pstop">STOP_ON_FAILURE</span><span></span>
+                      </div>
+                    </td>
+                    <td><span class="cmt-ph">optional comment…</span></td><td></td>
+                  </tr>
+                  <tr>
+                    <td class="sn">6</td><td><span class="pbadge pb-web">Web</span></td>
+                    <td><div class="kwname">close</div><div class="kwdesc">Close current browser window</div></td>
+                    <td><span class="praw">no parameters</span></td>
+                    <td><span class="cmt-ph">optional comment…</span></td><td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="status-bar"><span>web-project</span><span class="sb-right">🐍 login.py · Python · 445 B &nbsp;<span class="conn-dot">🌐 Connected</span>&nbsp; Ln 1, Col 1 &nbsp; 09:48 AM</span></div>
+          </div>
+
+          <!-- ── PANEL: SCRIPT VIEW ── -->
+          <div class="spanel spanel-hidden" id="panel-script">
+            <div class="inner-tabs">
+              <div class="itab">Table</div><div class="itab itab-active">Script</div><div class="itab">Data Binding</div>
+            </div>
+            <div class="code-editor-view">
+              <div class="line-gutter">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13</div>
+              <div class="code-view-body">
+                <span class="c-cmt"># Test case: login</span><br><br>
+                <span class="c-kw">from</span> <span class="c-fn">orbs.keyword.web</span> <span class="c-kw">import</span> Web<br>
+                <span class="c-kw">from</span> <span class="c-fn">orbs.config</span> <span class="c-kw">import</span> config<br><br>
+                <span class="c-kw">def</span> <span class="c-fn">run</span>():<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;url = config.<span class="c-fn">target</span>(<span class="c-str">"url"</span>, <span class="c-str">"https://www.saucedemo.com"</span>)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;Web.<span class="c-fn">open</span>(url)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;Web.<span class="c-fn">set_text</span>(<span class="c-str">"xpath=//input[@id='user-name']"</span>, config.<span class="c-fn">target</span>(<span class="c-str">"username"</span>, <span class="c-str">"standard_user"</span>))<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;Web.<span class="c-fn">set_text</span>(<span class="c-str">"xpath=//input[@id='password']"</span>, config.<span class="c-fn">target</span>(<span class="c-str">"password"</span>, <span class="c-str">"secret_sauce"</span>))<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;Web.<span class="c-fn">click</span>(<span class="c-str">"xpath=//input[@id='login-button']"</span>)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;Web.<span class="c-fn">close</span>()<br>
+              </div>
+            </div>
+            <div class="status-bar"><span>web-project</span><span class="sb-right">🐍 login.py · Python · 445 B &nbsp;<span class="conn-dot">🌐 Connected</span>&nbsp; Ln 1, Col 1 &nbsp; 09:48 AM</span></div>
+          </div>
+
+          <!-- ── PANEL: TEST SUITE ── -->
+          <div class="spanel spanel-hidden" id="panel-suite">
+            <div class="inner-tabs">
+              <div class="itab itab-active">Table</div><div class="itab">Script</div><div class="itab">⚡ Events</div>
+            </div>
+            <div class="panel-actions">
+              <button class="pabtn green">+ Add Test Case</button>
+              <button class="pabtn blue">✔ Enable All</button>
+              <button class="pabtn red-btn">✘ Disable All</button>
+              <span class="suite-hint">💡 Drag rows to reorder &nbsp;·&nbsp; 1 test case(s) · 1 enabled</span>
+            </div>
+            <div class="step-scroll">
+              <table class="steptable">
+                <thead><tr>
+                  <th style="width:90px">Enabled</th>
+                  <th>Test Case Path</th>
+                  <th style="width:80px">Actions</th>
+                </tr></thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align:center"><span class="check-tick">✔</span></td>
+                    <td style="font-family:var(--font-mono);font-size:12px;color:var(--text)">testcases/login.py</td>
+                    <td style="text-align:center;color:var(--text-3)">🗑</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="status-bar"><span>web-project</span><span class="sb-right">⚡ login.yml · YAML · 59 B &nbsp;<span class="conn-dot">🌐 Connected</span>&nbsp; Ln 1, Col 1 &nbsp; 09:48 AM</span></div>
+          </div>
+
+          <!-- ── PANEL: DATA BINDING ── -->
+          <div class="spanel spanel-hidden" id="panel-databind">
+            <div class="inner-tabs">
+              <div class="itab">Table</div><div class="itab">Script</div><div class="itab itab-active">Data Binding</div>
+            </div>
+            <div class="db-toolbar">
+              <span class="db-lbl">Data Source</span>
+              <div class="db-inp">select data file from project data/</div>
+              <span class="db-lbl" style="margin-left:16px">Scenario Bind</span>
+              <div class="db-sel">(none) ▾</div>
+              <button class="pabtn blue" style="margin-left:12px">Apply</button>
+              <button class="pabtn">Reset</button>
+            </div>
+            <div class="db-body">
+              <p class="db-title">Columns → Variable</p>
+              <p class="db-empty">No mappings yet (load CSV to auto-map)</p>
+              <p class="db-title" style="margin-top:20px">Preview</p>
+              <div class="db-preview-row">
+                <div class="db-where">
+                  <p class="db-lbl">Where</p>
+                  <p class="db-empty" style="margin-top:4px">No conditions</p>
+                  <button class="pabtn" style="margin-top:12px">Add condition</button>
+                </div>
+                <div class="db-csv">
+                  <div class="db-csv-hint">Paste CSV here, first row as headers</div>
+                  <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-2);margin-top:6px">username,password<br>standard_user,secret_sauce</div>
+                </div>
+                <div class="db-nopreview">No preview data</div>
+              </div>
+            </div>
+            <div class="status-bar"><span>web-project</span><span class="sb-right">🐍 login.py · Python · 445 B &nbsp;<span class="conn-dot">🌐 Connected</span>&nbsp; Ln 1, Col 1 &nbsp; 09:48 AM</span></div>
+          </div>
+
+        </div><!-- /studio-main-area -->
+      </div><!-- /studio-body -->
+    </div><!-- /studio-window -->
+  </div>
+</section>
+
+
+<div class="divider"></div>
+
+<!-- CTA -->
+<section class="cta-section" id="download">
+  <div class="container">
+    <div class="cta-card reveal">
+      <h2>Your tests deserve<br /><span style="background:linear-gradient(135deg,#4f8ef7,#7c5cf7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">better tooling.</span></h2>
+      <p>Download Orbs Studio and install the CLI in under two minutes.<br />No account required. No credit card. Just better testing.</p>
+      <div class="cta-buttons">
+        <a href="#" class="btn btn-primary" style="font-size:16px;padding:14px 32px">⬇ Download Orbs Studio</a>
+        <a href="#" class="btn btn-secondary" style="font-size:16px;padding:14px 32px">pip install orbs-cli</a>
+      </div>
+      <div class="cta-note">macOS · Windows · Linux &nbsp;·&nbsp; Python 3 &nbsp;·&nbsp; Apache 2 License</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <div class="logo-icon" style="width:24px;height:24px;font-size:11px">⬡</div>
+        <span>Orbs</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://docs.orbsapp.com" target="_blank">Docs</a>
+        <a href="https://github.com/badrusalam11/orbs-cli" target="_blank">GitHub</a>
+        <a href="https://docs.orbsapp.com/cli-reference" target="_blank">CLI Reference</a>
+        <!-- <a href="#">Changelog</a> -->
+        <a href="mailto:badrusalam760@gmail.com" target="_blank">Contact</a>
+      </div>
+      <div class="footer-copy">© 2026 Orbs. Apache 2 License.</div>
+    </div>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(el => observer.observe(el));
+
+  // Nav scroll tint
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    nav.style.background = window.scrollY > 40
+      ? 'rgba(8,10,15,0.92)'
+      : 'rgba(8,10,15,0.7)';
+  });
+
+  // Studio tab switching
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.spanel').forEach(p => p.classList.add('spanel-hidden'));
+    const panel = document.getElementById('panel-' + tab);
+    if (panel) panel.classList.remove('spanel-hidden');
+    const ftabPy  = document.getElementById('ftab-py');
+    const ftabYml = document.getElementById('ftab-yml');
+    if (tab === 'suite') {
+      ftabPy.classList.remove('ftab-active'); ftabPy.classList.add('ftab-hidden');
+      ftabYml.classList.remove('ftab-hidden'); ftabYml.classList.add('ftab-active');
+      document.getElementById('exp-login-py').classList.remove('exp-active');
+    } else {
+      ftabYml.classList.remove('ftab-active'); ftabYml.classList.add('ftab-hidden');
+      ftabPy.classList.remove('ftab-hidden'); ftabPy.classList.add('ftab-active');
+      document.getElementById('exp-login-py').classList.add('exp-active');
+    }
+  }
+</script>
+</body>
+</html>
