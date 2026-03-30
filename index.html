@@ -1306,9 +1306,12 @@
     <div class="cta-card reveal">
       <h2>Your tests deserve<br /><span style="background:linear-gradient(135deg,#4f8ef7,#7c5cf7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">better tooling.</span></h2>
       <p>Download Orbs Studio and install the CLI in under two minutes.<br />No account required. No credit card. Just better testing.</p>
-      <div class="cta-buttons">
-        <a href="#" class="btn btn-primary" style="font-size:16px;padding:14px 32px">⬇ Download Orbs Studio</a>
+      <div class="cta-buttons" id="download-buttons">
+        <a id="download-main" href="#" class="btn btn-primary" style="font-size:16px;padding:14px 32px" target="_blank" rel="noopener noreferrer">⬇ Download Orbs Studio</a>
         <a href="#" class="btn btn-secondary" style="font-size:16px;padding:14px 32px">pip install orbs-cli</a>
+      </div>
+      <div id="download-fallback" style="margin-top: 14px; color: var(--text-2); font-size: 13px;">
+        Loading latest release assets...
       </div>
       <div class="cta-note">macOS · Windows · Linux &nbsp;·&nbsp; Python 3 &nbsp;·&nbsp; Apache 2 License</div>
     </div>
@@ -1375,6 +1378,88 @@
       document.getElementById('exp-login-py').classList.add('exp-active');
     }
   }
+
+  // Auto-update download artifact links from GitHub release API
+  async function initDistributionDownloads() {
+    const apiUrl = 'https://api.github.com/repos/badrusalam11/orbs-distribution/releases/latest';
+    const mainBtn = document.getElementById('download-main');
+    const status = document.getElementById('download-fallback');
+
+    if (!mainBtn || !status) return;
+
+    try {
+      const resp = await fetch(apiUrl);
+      if (!resp.ok) throw new Error(`Fetch failed (${resp.status})`);
+      const release = await resp.json();
+      const assets = Array.isArray(release.assets) ? release.assets : [];
+      const mapping = {
+        windows: null,
+        mac_intel: null,
+        mac_arm: null,
+        linux: null,
+      };
+
+      assets.forEach(asset => {
+        const name = (asset.name || '').toLowerCase();
+        if (name.endsWith('.exe')) {
+          mapping.windows = asset;
+        } else if (name.endsWith('.appimage')) {
+          mapping.linux = asset;
+        } else if (name.endsWith('.dmg')) {
+          if (name.includes('arm64') || name.includes('m1') || name.includes('m2')) {
+            mapping.mac_arm = asset;
+          } else {
+            mapping.mac_intel = asset;
+          }
+        }
+      });
+
+      const platform = navigator.userAgent || navigator.platform || '';
+      const isWindows = /win/i.test(platform);
+      const isMac = /mac|darwin/i.test(platform);
+      const isArmMac = isMac && /arm|aarch64/i.test(platform);
+      const isLinux = /linux/i.test(platform);
+
+      let chosen = null;
+      if (isWindows && mapping.windows) {
+        chosen = mapping.windows;
+      } else if (isMac && isArmMac && mapping.mac_arm) {
+        chosen = mapping.mac_arm;
+      } else if (isMac && mapping.mac_intel) {
+        chosen = mapping.mac_intel;
+      } else if (isMac && mapping.mac_arm) {
+        chosen = mapping.mac_arm;
+      } else if (isLinux && mapping.linux) {
+        chosen = mapping.linux;
+      }
+
+      const fallback = mapping.windows || mapping.mac_intel || mapping.mac_arm || mapping.linux;
+      if (!fallback) {
+        status.textContent = 'No downloadable assets found for the latest release.';
+        mainBtn.textContent = 'Download Orbs Studio';
+        mainBtn.removeAttribute('href');
+        return;
+      }
+
+      const link = chosen || fallback;
+      mainBtn.href = link.browser_download_url;
+      mainBtn.textContent = `⬇ Download Orbs Studio (${link.name})`;
+
+      const version = release.tag_name || release.name || 'latest';
+      status.innerHTML = `Latest release <strong>${version}</strong> available. ` +
+        `Options: ${mapping.windows ? `<a href="${mapping.windows.browser_download_url}" target="_blank" rel="noopener noreferrer">Windows</a>` : 'Windows unavailable'}, ` +
+        `${mapping.mac_intel ? `<a href="${mapping.mac_intel.browser_download_url}" target="_blank" rel="noopener noreferrer">macOS Intel</a>` : 'macOS Intel unavailable'}, ` +
+        `${mapping.mac_arm ? `<a href="${mapping.mac_arm.browser_download_url}" target="_blank" rel="noopener noreferrer">macOS M</a>` : 'macOS M unavailable'}, ` +
+        `${mapping.linux ? `<a href="${mapping.linux.browser_download_url}" target="_blank" rel="noopener noreferrer">Linux</a>` : 'Linux unavailable'}`;
+    } catch (err) {
+      console.error('Error loading release assets:', err);
+      status.textContent = 'Gagal memuat link download. Coba refresh halaman.';
+      mainBtn.href = 'https://github.com/badrusalam11/orbs-distribution/releases/latest';
+      mainBtn.textContent = '⬇ Download Orbs Studio (manual)';
+    }
+  }
+
+  initDistributionDownloads();
 </script>
 </body>
 </html>
