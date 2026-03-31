@@ -833,6 +833,15 @@
     font-size: 12px; color: var(--text-3); font-style: italic;
   }
 
+  .demo {
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 100px;
+}
   /* Scrollbar ── */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
@@ -857,6 +866,7 @@
         Orbs
       </a>
       <ul class="nav-links">
+        <li><a href="#demo">Demo</a></li>
         <li><a href="#features">Features</a></li>
         <li><a href="#how">How It Works</a></li>
         <li><a href="#showcase">Studio</a></li>
@@ -879,6 +889,23 @@
     <a id="hero-download" href="#download" class="btn btn-primary" onclick="event.preventDefault(); document.getElementById('download').scrollIntoView({ behavior: 'smooth', block: 'start' });">⬇ Download Orbs Studio</a>
     <a href="https://docs.orbsapp.com" target="_blank" class="btn btn-secondary">View Docs →</a>
   </div>
+
+<section class="demo" id="demo">
+  <div class="container">
+    <div class="features-header reveal">
+      <div class="section-label">// Demo</div>
+      <h2 class="section-title">See Orbs in Action</h2>
+      <p class="section-desc">Build and run your first test in minutes..</p>
+    </div>
+    <video
+      src="assets/demo-orbs.mp4"
+      controls
+      muted
+      playsinline
+      style="width:100%;max-width:760px;border-radius:16px;border:1px solid var(--border);box-shadow:0 0 80px rgba(79,142,247,0.1),0 40px 80px rgba(0,0,0,0.5);"
+    ></video>
+  </div>
+</section>
 
   <div class="hero-terminal">
     <div class="terminal-header">
